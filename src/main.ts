@@ -1,31 +1,51 @@
 import express from 'express';
 import Path from 'path';
+import fs from 'fs/promises'
 import { environment } from './environment';
 import { LoadFileMappings } from './project-loader';
 import { CrystalAsset } from './types';
+import { SubstituteLinks } from './dom-parser';
 
 (async () => {
     const app = express();
 
     // Read through the config and bind all of the projects
-    const domainMap = new Map<string, { host: string, path: string }>();
-    const metadataMap = new Map<string, Map<string, CrystalAsset>>();
+    // const domainMap = new Map<string, { host: string, path: string, project: typeof environment['projects'][0] }>();
+    const domainMap = new Map<string, {
+        assets: Map<string, CrystalAsset>,
+        path: string,
+        rootUrls: string[],
+        rootDomains: Map<string, boolean>
+    }>();
 
-    for (const { domainMapping, path } of environment.projects) {
+    for (const { domain, path } of environment.projects) {
         const projectPath = Path.resolve(path);
-        const fileMetadata = LoadFileMappings(projectPath);
-        const domains = domainMapping;
+        const {
+            assets,
+            rootUrls
+        } = LoadFileMappings(projectPath);
 
-        // project the domains in reverse to act as an optimized lookup table
-        domains.forEach(d => {
-            domainMap.set(d.to, { host: d.from, path });
-            const metadata = fileMetadata.filter(m =>
-                m.host == d.from
-            );
-            const domainMdMap = new Map();
-            metadata.forEach(md => domainMdMap.set(md.path, md));
-            metadataMap.set(d.from, domainMdMap);
+        const assetMap = new Map();
+        assets.forEach(a => assetMap.set(a.path, a));
+        const rootDomains = new Map();
+
+        rootUrls.forEach(u => {
+            try {
+                const url = new URL(u);
+                rootDomains.set(url.host, true);
+            }
+            catch(ex) {
+                debugger;
+            }
         });
+
+        domainMap.set(domain, { 
+            assets: assetMap, 
+            path: projectPath,
+            rootUrls,
+            rootDomains
+        });
+
     }
 
     // Router to check if there are any matching crystal asset groups to
@@ -41,13 +61,9 @@ import { CrystalAsset } from './types';
          *     www.example.com -> www.foo.com
          *     (@).example.com -> (@).foo.com
          */
-        const matchedDomain = domainMap.get(req.hostname);
-        if (!matchedDomain) return next();
+        const { assets, path, rootDomains } = domainMap.get(req.hostname);
+        if (!assets) return next();
 
-        // Now, resolve the file based off of the match we make
-        const assets = metadataMap.get(matchedDomain.host);
-
-        // Now, we filter to all matching assets. 
         const asset = assets?.get(req.path);
 
         // If we didn't get an asset, that's a 404
@@ -71,10 +87,24 @@ import { CrystalAsset } from './types';
         const t3 = ref.slice(9, 12);
         const t4 = ref.slice(12, 15);
 
-        const fileLocation = Path.join(matchedDomain.path, 'revisions', t0, t1, t2, t3, t4);
+        const fileLocation = Path.join(path, 'revisions', t0, t1, t2, t3, t4);
 
         res.status(asset.metadata.status_code);
         asset.metadata.headers.forEach(([k,v]) => res.setHeader(k, v));
+
+        const [ct, contentType] = asset.metadata.headers.find(([k, v]) => k.toLowerCase() == "content-type");
+        // TODO: replace in JS files?
+        if (contentType.includes("text/html")) {
+            // TODO: Do we really ever need to use this? 
+            const charset = contentType.match(/charset=([^;]+)/)?.[1];
+            fs.readFile(fileLocation, 'utf8')
+                .then(contents => {
+                    res.send(SubstituteLinks(contents, rootDomains, req));
+                })
+                .catch(err => next(err))
+            return;
+        }
+
         res.sendFile(fileLocation);
     });
 

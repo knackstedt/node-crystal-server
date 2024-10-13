@@ -7,9 +7,11 @@
   "private": true,
   "dependencies": {
     "@types/better-sqlite3": "^7.6.11",
+    "@types/jsdom": "^21.1.7",
     "better-sqlite3": "^11.3.0",
     "express": "^4.18.1",
     "istextorbinary": "^6.0.0",
+    "jsdom": "^25.0.1",
     "mime-types": "^2.1.35",
     "pino": "^9.4.0",
     "tslib": "^2.3.0",
