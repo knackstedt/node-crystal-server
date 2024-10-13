@@ -5,7 +5,7 @@ USER 0
 ENV NODE_ENV production
 
 # Install node
-RUN apk add nodejs npm nginx
+RUN apk add nodejs npm nginx openssl
 
 # Pull in nginx configuration
 COPY ./nginx.conf /etc/nginx/nginx.conf
@@ -29,4 +29,4 @@ RUN npm i --omit=dev
 
 EXPOSE 8080
 
-CMD ["/bin/sh", "-c", "nginx \"-g daemon off;\" & node server/primary.js"]
+CMD ["/bin/sh", "docker-entrypoint.sh"]
