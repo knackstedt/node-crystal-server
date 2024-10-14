@@ -4,10 +4,6 @@ import { logger } from './logger';
 
 const cpus = os.cpus().length;
 
-// TODO: Once we know how to share socket.io connections
-// across instances, increase this.
-const maxWorkers = 1;
-
 const workers: Worker[] = [];
 
 const spawnWorker = () => {
@@ -33,7 +29,7 @@ if (cluster.isPrimary) {
     // overqueueing
     const spawn = () => {
         setTimeout(() => {
-            if (i++ < Math.min(maxWorkers, cpus)) {
+            if (i++ < cpus) {
                 spawnWorker();
                 spawn();
             }
@@ -42,16 +38,6 @@ if (cluster.isPrimary) {
     spawn();
 }
 else {
-
-    // const httpServer = http.createServer();
-    // const io = new Server(httpServer);
-
-    // // use the cluster adapter
-    // io.adapter(createAdapter());
-
-    // // setup connection with the primary process
-    // setupWorker(io);
-
     // Workers will run the normal webserver service.
     require('./main');
 }

@@ -5,12 +5,11 @@ import { environment } from './environment';
 import { LoadFileMappings } from './project-loader';
 import { CrystalAsset } from './types';
 import { SubstituteLinks } from './dom-parser';
+import { logger } from './logger';
 
 (async () => {
     const app = express();
 
-    // Read through the config and bind all of the projects
-    // const domainMap = new Map<string, { host: string, path: string, project: typeof environment['projects'][0] }>();
     const domainMap = new Map<string, {
         assets: Map<string, CrystalAsset>,
         path: string,
@@ -19,33 +18,42 @@ import { SubstituteLinks } from './dom-parser';
     }>();
 
     for (const { domain, path } of environment.projects) {
-        const projectPath = Path.resolve(path);
-        const {
-            assets,
-            rootUrls
-        } = LoadFileMappings(projectPath);
+        try {
 
-        const assetMap = new Map();
-        assets.forEach(a => assetMap.set(a.path, a));
-        const rootDomains = new Map();
-
-        rootUrls.forEach(u => {
-            try {
-                const url = new URL(u);
-                rootDomains.set(url.host, true);
-            }
-            catch(ex) {
-                debugger;
-            }
-        });
-
-        domainMap.set(domain, { 
-            assets: assetMap, 
-            path: projectPath,
-            rootUrls,
-            rootDomains
-        });
-
+            const projectPath = Path.resolve(path);
+            const {
+                assets,
+                rootUrls
+            } = LoadFileMappings(projectPath);
+    
+            const assetMap = new Map();
+            assets.forEach(a => assetMap.set(a.path, a));
+            const rootDomains = new Map();
+    
+            rootUrls.forEach(u => {
+                try {
+                    const url = new URL(u);
+                    rootDomains.set(url.host, true);
+                }
+                catch(ex) {
+                    debugger;
+                }
+            });
+    
+            domainMap.set(domain, { 
+                assets: assetMap, 
+                path: projectPath,
+                rootUrls,
+                rootDomains
+            });
+        }
+        catch(ex) {
+            logger.error({
+                msg: "Failed to load crystal project at" + path,
+                message: ex.message,
+                stack: ex.stack
+            });
+        }
     }
 
     // Router to check if there are any matching crystal asset groups to

@@ -1,5 +1,4 @@
 import { JSDOM } from 'jsdom';
-import { environment } from './environment';
 import { URL } from 'url';
 import { Request } from 'express';
 
@@ -14,8 +13,6 @@ export const SubstituteLinks = (
     const document = dom.window.document;
 
     const updateUrl = (original: string) => {
-        // Replace ALL? urls with **our** domain
-
         if (!original.startsWith("http")) {
             original = original.startsWith('/') ? original : '/' + original;
             original = req.protocol + '://' + req.get("host") + original;
