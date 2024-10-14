@@ -8,6 +8,7 @@
     "rootDir": "./src",
     "outDir": "./dist/",
     "strict": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true
   }
 }
