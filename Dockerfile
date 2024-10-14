@@ -12,7 +12,7 @@ RUN npm i --omit=dev
 
 
 
-FROM nginx:stable-alpine3.20-otel
+FROM nginx:stable-alpine3.20
 ENV NODE_ENV production
 
 RUN apk add nodejs openssl
