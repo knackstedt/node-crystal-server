@@ -40,9 +40,19 @@ else
     printf "${BLUE}Valid certificate found.${NC}\n"
 fi
 
-printf "${BLUE}Starting ${GREEN}nginx ${BLUE}...${NC}\n"
-nginx "-g daemon off;"
 
-printf "${BLUE}Starting ${YELLOW}nodejs ${BLUE}...${NC}\n"
-node primary.js
+nginx="nginx -g daemon off;"
+node="node primary.js"
+
+# printf "${BLUE}Starting ${GREEN}nginx ${BLUE}...${NC}\n"
+eval "${nginx}" &
+# printf "${BLUE}Starting ${YELLOW}nodejs ${BLUE}...${NC}\n"
+eval "${node}" &
+
+wait $PID1
+if (($? != 0)); then
+    echo "ERROR: nginx exited with non-zero exitcode" >&2
+    kill -9 $PID1
+    exitcode=$((exitcode+1))
+fi
 
