@@ -3,6 +3,7 @@ import json5 from 'json5';
 
 let conf = '{}';
 try { conf = fs.readFileSync('/data/config.json', 'utf8') } catch(ex) {}
+try { conf = fs.readFileSync('/data/config.json5', 'utf8') } catch(ex) {}
 
 const configuration = json5.parse(conf);
 

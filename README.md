@@ -24,7 +24,7 @@ All configuration should be stored under `/data/`. Including the websites config
         └── ...
 ```
 
-The main configuration file is a JSON5 formatted file located at `/data/config.json`.
+The main configuration file is a JSON5 formatted file located at `/data/config.json` or `/data/config.json5`.
 ```json
 {
     // The port the program will listen on.
