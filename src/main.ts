@@ -106,11 +106,11 @@ import { logger } from './logger';
 
         res.status(asset.metadata.status_code);
         asset.metadata.headers
-            .filter(([k, v]) => !["content-length", "transfer-encoding"].includes(k))
+            .filter(([k, v]) => !["content-length", "transfer-encoding"].includes(k.toLowerCase()))
             .forEach(([k,v]) => res.setHeader(k, v));
 
         const [ct, contentType] = asset.metadata.headers.find(([k, v]) => k.toLowerCase() == "content-type") || [];
-        // TODO: replace in JS files?
+        // TODO: replace in JS+json files?
         if (contentType?.includes("text/html")) {
             // TODO: Do we really ever need to use this? 
             const charset = contentType.match(/charset=([^;]+)/)?.[1];
