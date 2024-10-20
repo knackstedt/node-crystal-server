@@ -105,7 +105,9 @@ import { logger } from './logger';
         const fileLocation = Path.join(path, 'revisions', t0, t1, t2, t3, t4);
 
         res.status(asset.metadata.status_code);
-        asset.metadata.headers.forEach(([k,v]) => res.setHeader(k, v));
+        asset.metadata.headers
+            .filter(([k, v]) => !["content-length", "transfer-encoding"].includes(k))
+            .forEach(([k,v]) => res.setHeader(k, v));
 
         const [ct, contentType] = asset.metadata.headers.find(([k, v]) => k.toLowerCase() == "content-type") || [];
         // TODO: replace in JS files?
