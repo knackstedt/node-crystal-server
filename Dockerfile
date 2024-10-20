@@ -37,6 +37,8 @@ RUN chown -R 101:101 "/var/cache/nginx/.npm"
 RUN chmod 1777 /tmp -R
 USER 101
 
+RUN mkdir /tmp/nginx
+
 EXPOSE 8080
 
 CMD ["/bin/sh", "docker-entrypoint.sh"]
