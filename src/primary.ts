@@ -2,7 +2,7 @@ import cluster, { Worker } from 'cluster';
 import os from 'os';
 import { logger } from './logger';
 
-const cpus = os.cpus().length;
+const cpus = 1;//os.cpus().length;
 
 const workers: Worker[] = [];
 
