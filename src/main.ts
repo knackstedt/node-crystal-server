@@ -15,6 +15,7 @@ import { logger } from './logger';
     app.use((req, res, next) => {
         req.get("user-agent")?.includes("kube-probe") ? res.sendStatus(200) : next()
     })
+    app.use("/.well-known", (req, res, next) => res.sendStatus(200));
 
     const domainMap = new Map<string, {
         assets: Map<string, CrystalAsset>,
