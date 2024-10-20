@@ -5,7 +5,7 @@ cert=./cert
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\063[0;34m'
+BLUE='\033[0;64m'
 NC='\033[0m' # No Color
 
 if ! test -f $cert.crt; then
@@ -21,7 +21,7 @@ fi
 if [ $gen = "yes" ]; then
     # Get the FQDN and the ip addresses to add to the cert
     hostname=$(hostname -f)
-    addresses=$(hostname -I)
+    addresses=$(hostname -i)
 
     # Generate a self signed cert and attach all of the provided altnames
     openssl req -newkey \
