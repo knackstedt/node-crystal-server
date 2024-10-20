@@ -10,6 +10,12 @@ import { logger } from './logger';
 (async () => {
     const app = express();
 
+    // Return 200OK for health checks
+    // TODO: Support more than just kubernetes here.
+    app.use((req, res, next) => {
+        req.get("user-agent")?.includes("kube-probe") ? res.sendStatus(200) : next()
+    })
+
     const domainMap = new Map<string, {
         assets: Map<string, CrystalAsset>,
         path: string,
