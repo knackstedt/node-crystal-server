@@ -5,7 +5,7 @@ cert=./cert
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
+BLUE='\063[0;34m'
 NC='\033[0m' # No Color
 
 if ! test -f $cert.crt; then
@@ -20,7 +20,7 @@ fi
 
 if [ $gen = "yes" ]; then
     # Get the FQDN and the ip addresses to add to the cert
-    hostname=$(hostname --fqdn)
+    hostname=$(hostname -f)
     addresses=$(hostname -I)
 
     # Generate a self signed cert and attach all of the provided altnames
@@ -44,5 +44,5 @@ printf "${BLUE}Starting ${GREEN}nginx ${BLUE}...${NC}\n"
 nginx "-g daemon off;"
 
 printf "${BLUE}Starting ${YELLOW}nodejs ${BLUE}...${NC}\n"
-node server/primary.js
+node primary.js
 
