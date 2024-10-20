@@ -41,7 +41,7 @@ else
 fi
 
 
-nginx="nginx -g daemon off;"
+nginx="nginx \"-g daemon off;\""
 node="node primary.js"
 
 # printf "${BLUE}Starting ${GREEN}nginx ${BLUE}...${NC}\n"
