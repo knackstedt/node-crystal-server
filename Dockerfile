@@ -29,6 +29,7 @@ WORKDIR /app
 COPY --from=build /tmp/dist /app/
 COPY --from=build /tmp/package.json /app/package.json
 COPY --from=build /tmp/node_modules /app/node_modules
+COPY --from=build /tmp/docker-entrypoint.sh /app/docker-entrypoint.sh
 
 RUN chown -R 101:101 "/app"
 RUN mkdir /var/cache/nginx/.npm
