@@ -75,7 +75,7 @@ import { logger } from './logger';
          *     www.example.com -> www.foo.com
          *     (@).example.com -> (@).foo.com
          */
-        const { assets, path, rootDomains } = domainMap.get(req.hostname);
+        const { assets, path, rootDomains } = domainMap.get(req.hostname) || {};
         if (!assets) return next();
 
         const asset = assets?.get(req.path);
@@ -106,9 +106,9 @@ import { logger } from './logger';
         res.status(asset.metadata.status_code);
         asset.metadata.headers.forEach(([k,v]) => res.setHeader(k, v));
 
-        const [ct, contentType] = asset.metadata.headers.find(([k, v]) => k.toLowerCase() == "content-type");
+        const [ct, contentType] = asset.metadata.headers.find(([k, v]) => k.toLowerCase() == "content-type") || [];
         // TODO: replace in JS files?
-        if (contentType.includes("text/html")) {
+        if (contentType?.includes("text/html")) {
             // TODO: Do we really ever need to use this? 
             const charset = contentType.match(/charset=([^;]+)/)?.[1];
             fs.readFile(fileLocation, 'utf8')
