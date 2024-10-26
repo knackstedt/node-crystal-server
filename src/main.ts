@@ -77,12 +77,16 @@ import { logger } from './logger';
          *     (@).example.com -> (@).foo.com
          */
         const { assets, path, rootDomains } = domainMap.get(req.hostname) || {};
-        if (!assets) return next();
+        if (!assets) {
+            // Requests that come in on unmapped hosts will be 502 errors
+            return next(502);
+        }
 
         const asset = assets?.get(req.path);
 
-        // If we didn't get an asset, that's a 404
+        // If we didn't locate an asset, that's a 404
         if (!asset) {
+            res.set("x-reason", "noasset");
             return next();
         }
         
